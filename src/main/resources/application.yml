@@ -1,0 +1,83 @@
+# 设置端口
+server:
+  port: 7777
+spring:
+  # 设置数据库
+  datasource:
+    url: jdbc:mysql://localhost:3306/tidc_clock_in?characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: e2604cde7c5a4f68
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # 设置上传文件时的最大文件大小和请求体大小
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 5MB
+  # redis配置
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 1
+    # Redis服务器地址
+    host: 127.0.0.1
+    # Redis服务器连接端口
+    port: 6379
+    # 密码默认为空
+    # 连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 200
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0
+mybatis-plus:
+  #  configuration:
+  #    # 控制台日志打印
+  #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    # 数据库设置：逻辑删除、主键自增
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
+  # 指定路径
+  mapper-locations: classpath:mapper/*.xml
+sa-token:
+  # token名称
+  token-name: TidcToken
+  # token有效期 - 30天
+  timeout: 2592000
+  # 是否允许并发登录
+  is-concurrent: true
+  # 多人登录同一账号时，是否共享一个token
+  is-share: true
+  # token风格
+  token-style: uuid
+  # 输出日志
+  is-log: false
+
+# 微信小程序登录配置
+#wx:
+#  wxUrl: "https://api.weixin.qq.com/sns/jscode2session"
+#  appid: "wxb2fc869f9e322761"
+#  # 密钥
+#  secret: "97cd951564ba90ed55722a4e81e8628c"
+wx:
+  wxUrl: "https://api.weixin.qq.com/sns/jscode2session"
+  appid: "wx4123189ee946f1c7"
+  # 密钥
+  secret: "a2f69b97e1564d33576a426161ecc438"
+avatar:
+  # 充满希望的默认头像
+  default: "http://43.138.182.139/f7d6c74b-778f-4d79-931b-25cc40005414.jpg"
+  #  url: "D:/java-img/"
+  url: "/opt/avatar/"
+
+# 公网ip 或者是 域名
+public-domain:
+  url: "http://43.138.182.139/"
