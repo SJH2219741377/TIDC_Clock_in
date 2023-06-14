@@ -5,8 +5,8 @@ spring:
   # 设置数据库
   datasource:
     url: jdbc:mysql://localhost:3306/tidc_clock_in?characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: e2604cde7c5a4f68
+    username: 你的用户名
+    password: 你的密码
     driver-class-name: com.mysql.cj.jdbc.Driver
   # 设置上传文件时的最大文件大小和请求体大小
   servlet:
@@ -62,22 +62,19 @@ sa-token:
   is-log: false
 
 # 微信小程序登录配置
-#wx:
-#  wxUrl: "https://api.weixin.qq.com/sns/jscode2session"
-#  appid: "wxb2fc869f9e322761"
-#  # 密钥
-#  secret: "97cd951564ba90ed55722a4e81e8628c"
 wx:
   wxUrl: "https://api.weixin.qq.com/sns/jscode2session"
-  appid: "wx4123189ee946f1c7"
+  appid: "你的appid"
   # 密钥
-  secret: "a2f69b97e1564d33576a426161ecc438"
+  secret: "你的密钥"
 avatar:
   # 充满希望的默认头像
-  default: "http://43.138.182.139/f7d6c74b-778f-4d79-931b-25cc40005414.jpg"
+  default: "一个默认的头像访问链接"
+  # windows下的头像存放路径
   #  url: "D:/java-img/"
+  # linux的
   url: "/opt/avatar/"
 
 # 公网ip 或者是 域名
 public-domain:
-  url: "http://43.138.182.139/"
+  url: "你的域名"
