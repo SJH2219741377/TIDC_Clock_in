@@ -41,11 +41,12 @@ TIDC打卡小程序后端源码
 我们调用打卡和退卡的api接口时，应该传递**用户当前的经纬度和当前所连接的WiFi名称**，交给后端进行计算比对。
 计算公式如下：
 
-$a=\left(\operatorname{lat}-\operatorname{centerLat}\right) \times \frac{\pi}{180}$
+a=(\mathrm{lat}-\mathrm{centerLat}) \times \frac{\pi}{180}
 
-$b=\left(\operatorname{lon}-\operatorname{centerLon}\right) \times \frac{\pi}{180}$
+b=(\mathrm{lon}-\mathrm{centerLon}) \times \frac{\pi}{180}
 
-$s=2 \times \operatorname{asin}\left(\sqrt{\sin ^{2} \left(\frac{a}{2}\right)+\cos \left(\operatorname{radCurrentLat}\right) \times \cos \left(\operatorname{radCenterLat}\right) \times \sin ^{2} \left(\frac{b}{2}\right)}\right)$
+s=2 \times \sin^{-1}\left(\sqrt{\sin^{2}\left(\frac{a}{2}\right)+\cos(\mathrm{radCurrentLat})\times\cos(\mathrm{radCenterLat})\times\sin^{2}\left(\frac{b}{2}\right)}\right)
+
 
 后端实现：
 
