@@ -3,7 +3,7 @@ TIDC打卡小程序后端源码
 
 ## 登录流程
 
-[![image.png](https://api.apifox.cn/api/v1/projects/2760302/resources/386323/image-preview)](https://apifox.com/api/v1/projects/2760302/resources/386323/image-preview)
+![image.png](https://i.ibb.co/S3HFSqD/7ed1f985-f20f-4fa5-a346-523afa291e60.png)
 
 ## 头像问题
 
@@ -46,7 +46,6 @@ a=(\mathrm{lat}-\mathrm{centerLat}) \times \frac{\pi}{180}
 b=(\mathrm{lon}-\mathrm{centerLon}) \times \frac{\pi}{180}
 
 s=2 \times \sin^{-1}\left(\sqrt{\sin^{2}\left(\frac{a}{2}\right)+\cos(\mathrm{radCurrentLat})\times\cos(\mathrm{radCenterLat})\times\sin^{2}\left(\frac{b}{2}\right)}\right)
-
 
 后端实现：
 
