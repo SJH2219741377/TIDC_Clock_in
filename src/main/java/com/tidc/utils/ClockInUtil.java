@@ -12,11 +12,11 @@ public class ClockInUtil {
     /**
      * 中心纬度
      */
-    private static final double centerLat = 22.93473849826389;
+    private static final double centerLat = "your centerLat";
     /**
      * 中心经度
      */
-    private static final double centerLon = 113.72453179253472;
+    private static final double centerLon = "your centerLon";
     /**
      * 地球半径
      */
