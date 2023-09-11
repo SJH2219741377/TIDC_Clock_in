@@ -34,6 +34,7 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
     private final RegisterMapper registerMapper;
     private final UserMapper userMapper;
     private final DailyRecordMapper dailyRecordMapper;
+    private final MonthRecordMapper monthRecordMapper;
     private final WifiMapper wifiMapper;
     private final UserServiceImpl userService;
 
@@ -92,26 +93,35 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
         Review review = reviewMapper.selectOne(Wrappers.<Review>lambdaQuery()
                 .eq(Review::getUserOpenId, openId)
                 .eq(Review::getCheckStatus, TidcConstant.UNDER_APPROVAL));
-        if (ObjectUtil.isEmpty(review)) {
-            throw new ServiceException(ReturnCode.REVIEW_ERROR.getCode(), ReturnCode.REVIEW_ERROR.getMessage());
+        if (review == null) {
+            return ResultData.fail(ReturnCode.REVIEW_ERROR.getCode(), ReturnCode.REVIEW_ERROR.getMessage());
+        }
+
+        int checkType = review.getCheckType();
+        if (checkType != TidcConstant.REGISTRATION_APPLICATION && checkType != TidcConstant.UPDATE_PERSONAL_INFORMATION) {
+            return ResultData.fail(400,"审核类型出错");
         }
 
         // 根据审核类型执行相应操作
-        if (review.getCheckType() == TidcConstant.REGISTRATION_APPLICATION) {
+        if (checkType == TidcConstant.REGISTRATION_APPLICATION) {
             // 注册表用户插入到用户表
             RegisterTemp registerTemp = registerMapper.selectOne(Wrappers.<RegisterTemp>lambdaQuery()
                     .eq(RegisterTemp::getOpenId, openId));
-            Long count = userMapper.selectCount(Wrappers.<User>lambdaQuery().eq(User::getOpenId, openId));
-            if (count > 0) {
-                throw new ServiceException(ReturnCode.USER_ALREADY_EXIST.getCode(), ReturnCode.USER_ALREADY_EXIST.getMessage());
+            if (registerTemp == null) {
+                return ResultData.fail(ReturnCode.REVIEW_ERROR.getCode(), ReturnCode.REVIEW_ERROR.getMessage());
             }
+            Long userCount = userMapper.selectCount(Wrappers.<User>lambdaQuery().eq(User::getOpenId, openId));
+            if (userCount > 0) {
+                return ResultData.fail(ReturnCode.USER_ALREADY_EXIST.getCode(), ReturnCode.USER_ALREADY_EXIST.getMessage());
+            }
+
             // 获取锁
             lock.lock();
             try {
                 // 再次判断用户是否存在，避免竞争情况下出现重复插入的问题
-                count = userMapper.selectCount(Wrappers.<User>lambdaQuery().eq(User::getOpenId, openId));
-                if (count > 0) {
-                    throw new ServiceException(ReturnCode.USER_ALREADY_EXIST.getCode(), ReturnCode.USER_ALREADY_EXIST.getMessage());
+                userCount = userMapper.selectCount(Wrappers.<User>lambdaQuery().eq(User::getOpenId, openId));
+                if (userCount > 0) {
+                    return ResultData.fail(ReturnCode.USER_ALREADY_EXIST.getCode(), ReturnCode.USER_ALREADY_EXIST.getMessage());
                 }
                 // 删除注册表对应信息
                 registerMapper.delete(Wrappers.<RegisterTemp>lambdaQuery().eq(RegisterTemp::getOpenId, openId));
@@ -123,17 +133,15 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
                 lock.unlock();
             }
 
-        } else if (review.getCheckType() == TidcConstant.UPDATE_PERSONAL_INFORMATION) {
+        } else {
             // 修改个人资料
             int count = userMapper.update(null, Wrappers.<User>lambdaUpdate()
                     .eq(User::getOpenId, openId)
                     .set(User::getNickname, review.getUsername())
                     .set(User::getGender, review.getGender()));
             if (count <= 0) {
-                throw new UserNotExistException();
+                return ResultData.fail(ReturnCode.USER_NOT_EXIST.getCode(), ReturnCode.USER_NOT_EXIST.getMessage());
             }
-        } else {
-            throw new ServiceException("审核类型出错");
         }
 
         // 更新审核记录状态
@@ -141,12 +149,13 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
                 .eq(Review::getUserOpenId, openId)
                 .eq(Review::getCheckStatus, TidcConstant.UNDER_APPROVAL)
                 .set(Review::getCheckStatus, TidcConstant.APPROVAL_PASSED));
-        registerMapper.delete(Wrappers.<RegisterTemp>lambdaQuery().eq(RegisterTemp::getOpenId,openId));
         if (updateCount <= 0) {
-            throw new ServiceException(ReturnCode.REVIEW_ERROR.getCode(), ReturnCode.REVIEW_ERROR.getMessage());
+            return ResultData.fail(ReturnCode.REVIEW_ERROR.getCode(), ReturnCode.REVIEW_ERROR.getMessage());
         }
+
         return ResultData.success();
     }
+
 
     @Override
     public ResultData<String> reviewFail(String openId) {
@@ -248,6 +257,10 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
             throw new UserNotExistException();
         }
         userMapper.deleteById(user);
+        dailyRecordMapper.delete(Wrappers.<DailyRecord>lambdaQuery().eq(DailyRecord::getUserId, openId));
+        monthRecordMapper.delete(Wrappers.<MonthRecord>lambdaQuery().eq(MonthRecord::getUserId, openId));
+        registerMapper.delete(Wrappers.<RegisterTemp>lambdaQuery().eq(RegisterTemp::getOpenId, openId));
+        reviewMapper.delete(Wrappers.<Review>lambdaQuery().eq(Review::getUserOpenId, openId));
         return ResultData.success("删除成功");
     }
 
