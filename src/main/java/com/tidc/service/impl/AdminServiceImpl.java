@@ -141,6 +141,7 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
                 .eq(Review::getUserOpenId, openId)
                 .eq(Review::getCheckStatus, TidcConstant.UNDER_APPROVAL)
                 .set(Review::getCheckStatus, TidcConstant.APPROVAL_PASSED));
+        registerMapper.delete(Wrappers.<RegisterTemp>lambdaQuery().eq(RegisterTemp::getOpenId,openId));
         if (updateCount <= 0) {
             throw new ServiceException(ReturnCode.REVIEW_ERROR.getCode(), ReturnCode.REVIEW_ERROR.getMessage());
         }
@@ -153,6 +154,7 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
                 .eq(Review::getUserOpenId, openId)
                 .eq(Review::getCheckStatus, TidcConstant.UNDER_APPROVAL)
                 .set(Review::getCheckStatus, TidcConstant.APPROVAL_FAILED));
+        registerMapper.delete(Wrappers.<RegisterTemp>lambdaQuery().eq(RegisterTemp::getOpenId,openId));
         if (i <= 0) throw new ServiceException(ReturnCode.REVIEW_ERROR.getCode(), ReturnCode.REVIEW_ERROR.getMessage());
         return ResultData.success();
     }

@@ -20,7 +20,7 @@ public enum ReturnCode {
     FIELD_CANNOT_BE_NULL(304, "字段不能为空"),
     NOT_FOUND(305, "未查找到数据"),
     FIELD_VALUE_ERROR(306, "参数值错误"),
-    FIELD_NAME_ERROR_OR_VALUE_IS_NULL(307, "字段名错误或字段值为空"),
+    FIELD_NAME_ERROR_OR_VALUE_IS_NULL(307, "缺少字段或字段值错误"),
     REGISTER_REVIEW(308, "注册申请审核中,请勿重复提交"),
     REVIEW_ERROR(310, "审核失败,未找到相关信息"),
     USER_ALREADY_EXIST(311, "用户已存在"),

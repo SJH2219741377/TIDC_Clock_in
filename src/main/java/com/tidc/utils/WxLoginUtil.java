@@ -1,7 +1,10 @@
 package com.tidc.utils;
 
+import cn.hutool.core.lang.Console;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONUtil;
+import com.tidc.handler.exception.ServiceException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -46,7 +49,15 @@ public class WxLoginUtil {
      */
     public String getOpenId(String code) {
         String res = getLoginRes(code);
-        return JSONUtil.parseObj(res).get("openid").toString();
+        Console.log(res);
+        String openid = null;
+        if (res != null && JSONUtil.parseObj(res).containsKey("openid")) {
+            openid = JSONUtil.parseObj(res).get("openid").toString();
+        }
+        if (ObjectUtil.isEmpty(openid)) {
+            throw new ServiceException(40029, "code无效,可能是前后端Appid、secret不一致");
+        }
+        return openid;
     }
 
     public String getAppid() {
