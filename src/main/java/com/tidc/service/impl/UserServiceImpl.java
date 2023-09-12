@@ -96,22 +96,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return ResultData.fail(ReturnCode.WIFI_NOT_FOUND.getCode(), ReturnCode.WIFI_NOT_FOUND.getMessage());
         }
         double distance = ClockInUtil.calculateDistance(position.getLatitude(), position.getLongitude());
-        if (distance >= 30.0) {
-            return ResultData.fail(ReturnCode.CLOCK_IN_FAIL.getCode(), ReturnCode.CLOCK_IN_FAIL.getMessage());
+        if (distance >= 35.0) {
+            return ResultData.fail(ReturnCode.CLOCK_IN_FAIL.getCode(), "不在打卡范围内");
         }
         // 更新开始打卡时间
         DailyRecord dailyRecord = dailyRecordMapper.selectOne(Wrappers.<DailyRecord>lambdaQuery()
                 .eq(DailyRecord::getUserId, openId));
 
-        if (ObjectUtil.isEmpty(dailyRecord)) { // 无记录则创建
-            DailyRecord buildDailyRecord = DailyRecord.builder()
+        if (dailyRecord == null) { // 无记录则创建
+            dailyRecord = DailyRecord.builder()
                     .userId(openId)
                     .startTime(LocalDateTime.now())
                     .endTime(LocalDateTime.now())
+                    .clockStatus(TidcConstant.CLOCK_IN)
                     .build();
-            dailyRecordMapper.insert(buildDailyRecord);
+            dailyRecordMapper.insert(dailyRecord);
         } else {
-            // 确定打卡状态
+            // 已有打卡记录
             if (TidcConstant.CLOCK_IN == dailyRecord.getClockStatus()) {
                 throw new ServiceException(ReturnCode.CLOCK_IN_FAIL.getCode(), "打卡失败,目前正在打卡中");
             }
@@ -135,7 +136,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional
     public ResultData<String> clockOut(PositionDTO position, String openId) {
-        // 确定退卡位置是否符合 -> 使用WiFi组和位置进行比对
+//         确定退卡位置是否符合 -> 使用WiFi组和位置进行比对
         List<Wifi> wifiList = wifiMapper.selectList(null);
 
         if (ObjectUtil.isEmpty(wifiList)) {

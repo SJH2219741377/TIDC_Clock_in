@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -211,8 +212,8 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
     public ResultData<List<UserListVo>> getUserList() {
         List<User> userList = userMapper.selectList(null);
         List<DailyRecord> dailyRecordList = dailyRecordMapper.selectList(null);
-        if (ObjectUtil.hasEmpty(userList, dailyRecordList)) {
-            return ResultData.success(null, "暂无数据");
+        if (userList.isEmpty()) {
+            return ResultData.success(new ArrayList<>(), "暂无数据");
         }
         /*
             userList + dailyRecordList -> List<UserListVo>
@@ -224,9 +225,12 @@ public class AdminServiceImpl extends ServiceImpl<SuperAdminMapper, SuperAdmin> 
                 .map(user -> {
                     UserListVo userListVo = new UserListVo();
                     BeanUtil.copyProperties(user, userListVo);
-                    DailyRecord dailyRecord = dailyRecordList.stream()
-                            .filter(recode -> recode.getUserId().equals(user.getOpenId()))
-                            .findFirst().orElse(null);
+                    DailyRecord dailyRecord = null;
+                    if (dailyRecordList != null) {
+                        dailyRecord = dailyRecordList.stream()
+                                .filter(recode -> recode.getUserId().equals(user.getOpenId()))
+                                .findFirst().orElse(null);
+                    }
                     if (dailyRecord != null) {
                         userListVo.setStartTime(dailyRecord.getStartTime());
                         userListVo.setEndTime(dailyRecord.getEndTime());
